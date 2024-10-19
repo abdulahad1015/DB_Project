@@ -30,8 +30,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/movies_db'
 Bootstrap5(app)
-db = SQLAlchemy(model_class=Base)
-db.init_app(app)
+# db = SQLAlchemy(model_class=Base)
+# db.init_app(app)
 
 
 # CREATE DB
@@ -44,8 +44,8 @@ db.init_app(app)
 #     review: Mapped[str] = mapped_column(String(100), nullable=True)
 #     img_url: Mapped[str] = mapped_column(String(200), nullable=False)
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 class RateMovieForm(FlaskForm):
     rating = FloatField(label='Rating', validators=[DataRequired()])
@@ -58,7 +58,7 @@ class AddMovieForm(FlaskForm):
 
 @app.route("/")
 def home():
-    form = RateMovieForm
+    form = RateMovieForm()
     # with app.app_context():
     #     result = db.session.execute(db.select(movie).order_by(-movie.rating))
     #     movies = result.scalars().all()

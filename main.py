@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField,TextAreaField
 from wtforms.validators import DataRequired
 import requests
+import forms
 
 '''
 Red underlines? Install the required packages first: 
@@ -33,7 +34,6 @@ Bootstrap5(app)
 # db = SQLAlchemy(model_class=Base)
 # db.init_app(app)
 
-
 # CREATE DB
 # class movie(db.Model):
 #     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -47,18 +47,9 @@ Bootstrap5(app)
 # with app.app_context():
 #     db.create_all()
 
-class RateMovieForm(FlaskForm):
-    rating = FloatField(label='Rating', validators=[DataRequired()])
-    review = TextAreaField(label='Review', validators=[DataRequired()])
-    submit = SubmitField()
-
-class AddMovieForm(FlaskForm):
-    name = StringField('Enter Movie Name',validators=[DataRequired()])
-    submit = SubmitField()
-
 @app.route("/")
 def home():
-    form = RateMovieForm()
+    form = forms.AddRawMaterial()
     # with app.app_context():
     #     result = db.session.execute(db.select(movie).order_by(-movie.rating))
     #     movies = result.scalars().all()

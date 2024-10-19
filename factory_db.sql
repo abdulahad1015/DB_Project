@@ -29,9 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `contractor` (
   `contractor_id` int(11) NOT NULL,
-  `contractor_name` varchar(100) NOT NULL,
-  `contract_start_date` date DEFAULT NULL,
-  `contract_end_date` date DEFAULT NULL
+  `contractor_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -76,7 +74,6 @@ CREATE TABLE `product` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
-
 --
 -- Table structure for table `production_line`
 --

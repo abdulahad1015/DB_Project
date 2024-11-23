@@ -271,7 +271,19 @@ ALTER TABLE `production_report`
 ALTER TABLE `supervisor`
   ADD CONSTRAINT `supervisor_ibfk_1` FOREIGN KEY (`contractor_id`) REFERENCES `contractor` (`contractor_id`),
   ADD CONSTRAINT `supervisor_ibfk_2` FOREIGN KEY (`assigned_line`) REFERENCES `production_line` (`production_line_id`);
+
+CREATE TABLE `product_raw_material` (
+  `product_id` int(11) NOT NULL,
+  `raw_material_id` int(11) NOT NULL,
+  `quantity_required` int(11) NOT NULL,
+  PRIMARY KEY (`product_id`, `raw_material_id`),
+  FOREIGN KEY (`product_id`) REFERENCES `product`(`product_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`raw_material_id`) REFERENCES `raw_material`(`raw_material_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 COMMIT;
+
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

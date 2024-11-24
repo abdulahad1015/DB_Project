@@ -122,7 +122,7 @@ CREATE TABLE `production_report` (
 --
 
 CREATE TABLE `raw_material` (
-  `raw_material_id` int(11) NOT NULL,
+  `raw_material_id` INT AUTO_INCREMENT PRIMARY KEY,
   `material_name` varchar(100) NOT NULL,
   `supplier` varchar(100) DEFAULT NULL,
   `quantity_in_stock` int(11) NOT NULL,

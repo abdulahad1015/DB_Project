@@ -16,6 +16,14 @@ def view_raw_material():
     print(entries)
     return render_template('entries.html', raw_materials=entries)
 
+# (Added By Affan)
+@app.route('/products')
+def view_products():
+    entries = Product.query.all()  # Fetch all entries from the Product table
+    print(entries)  # Debugging: Print entries to console
+    return render_template('products.html', products=entries)
+
+
 # Add Raw Material
 @app.route('/add_raw_material', methods=['GET', 'POST'])
 def add_raw_material():

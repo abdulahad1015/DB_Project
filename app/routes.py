@@ -14,15 +14,7 @@ def index():
 def view_raw_material():
     entries = RawMaterial.query.all()
     print(entries)
-    return render_template('entries.html', raw_materials=entries)
-
-# (Added By Affan)
-@app.route('/products')
-def view_products():
-    entries = Product.query.all()  # Fetch all entries from the Product table
-    print(entries)  # Debugging: Print entries to console
-    return render_template('products.html', products=entries)
-
+    return render_template('raw_material.html', raw_materials=entries)
 
 # Add Raw Material
 @app.route('/add_raw_material', methods=['GET', 'POST'])
@@ -70,6 +62,13 @@ def delete_raw_material(material_id):
     flash("Raw material deleted successfully!", "success")
     return redirect(url_for('index'))
 
+# (Added By Affan)
+@app.route('/products')
+def view_products():
+    entries = Product.query.all()  # Fetch all entries from the Product table
+    print(entries)  # Debugging: Print entries to console
+    return render_template('product.html', products=entries)
+
 # Add Product (Added By Affan)
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
@@ -83,8 +82,8 @@ def add_product():
         db.session.add(new_product)
         db.session.commit()
         flash("Product added successfully!", "success")
-        return redirect(url_for('index'))
-    return render_template('add_product.html', form=form)
+        return redirect(url_for('view_products'))
+    return render_template('index.html', form=form)
 
 # Edit Product(Added By Affan)
 @app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
@@ -98,7 +97,7 @@ def edit_product(product_id):
         db.session.commit()
         flash("Product updated successfully!", "success")
         return redirect(url_for('index'))
-    return render_template('edit_product.html', form=form, product=product)
+    return render_template('index.html', form=form, product=product)
 
 # Delete Product (Added By Affan)
 @app.route('/delete_product/<int:product_id>', methods=['POST'])
@@ -107,4 +106,4 @@ def delete_product(product_id):
     db.session.delete(product)
     db.session.commit()
     flash("Product deleted successfully!", "success")
-    return redirect(url_for('index'))
+    return redirect(url_for('view_products'))

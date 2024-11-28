@@ -41,6 +41,13 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField("Register")
 
+# Add/Update Product (Added by Affan)
+class ProductForm(FlaskForm):
+    product_name = StringField("Product Name", validators=[DataRequired()])
+    category = StringField("Category", validators=[Optional()])
+    description = TextAreaField("Description", validators=[Optional()])
+    submit = SubmitField("Add/Update Product")
+
 # # Routes
 # @app.route('/')
 # def index():
@@ -87,7 +94,7 @@ class RegisterForm(FlaskForm):
 #     db.session.commit()
 #     flash("Raw material deleted successfully!", "success")
 #     return redirect(url_for('index'))
-#
+
 # # Register
 # @app.route('/register', methods=['GET', 'POST'])
 # def register():

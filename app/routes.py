@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for,flash
 # from . import create_app
-from .models import RawMaterial
+from .models import RawMaterial, Product
 from .forms import *
 from . import db
 from flask import current_app as app
@@ -60,4 +60,43 @@ def delete_raw_material(material_id):
     db.session.delete(material)
     db.session.commit()
     flash("Raw material deleted successfully!", "success")
+    return redirect(url_for('index'))
+
+# Add Product (Added By Affan)
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_product():
+    form = ProductForm()
+    if form.validate_on_submit():
+        new_product = Product(
+            product_name=form.product_name.data,
+            category=form.category.data,
+            description=form.description.data
+        )
+        db.session.add(new_product)
+        db.session.commit()
+        flash("Product added successfully!", "success")
+        return redirect(url_for('index'))
+    return render_template('add_product.html', form=form)
+
+# Edit Product(Added By Affan)
+@app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    form = ProductForm(obj=product)
+    if form.validate_on_submit():
+        product.product_name = form.product_name.data
+        product.category = form.category.data
+        product.description = form.description.data
+        db.session.commit()
+        flash("Product updated successfully!", "success")
+        return redirect(url_for('index'))
+    return render_template('edit_product.html', form=form, product=product)
+
+# Delete Product (Added By Affan)
+@app.route('/delete_product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    db.session.delete(product)
+    db.session.commit()
+    flash("Product deleted successfully!", "success")
     return redirect(url_for('index'))

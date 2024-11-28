@@ -9,3 +9,11 @@ class RawMaterial(db.Model):
     import_date = db.Column(db.Date, nullable=True)  # For import_date, can be NULL
     imported = db.Column(db.Boolean, nullable=False, default=False)  # For imported (tinyint)
     semi_finish = db.Column(db.Boolean, nullable=False, default=False)  # For semi_finish (tinyint)
+
+# (Added By Affan)
+class Product(db.Model):
+    __tablename__ = 'product'
+    product_id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Matches your schema's primary key
+    product_name = db.Column(db.String(100), nullable=False)  # For product_name
+    category = db.Column(db.String(50), nullable=True)  # For category, can be NULL
+    description = db.Column(db.Text, nullable=True)  # For description, can be NULL

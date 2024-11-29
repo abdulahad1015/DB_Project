@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2024 at 11:06 AM
+-- Generation Time: Nov 29, 2024 at 10:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -29,7 +29,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `contractor` (
   `contractor_id` int(11) NOT NULL,
-  `contractor_name` varchar(100) NOT NULL
+  `contractor_name` varchar(100) NOT NULL,
+  `contract_start_date` date DEFAULT NULL,
+  `contract_end_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -73,7 +75,15 @@ CREATE TABLE `product` (
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `product`
+--
+
+INSERT INTO `product` (`product_id`, `product_name`, `category`, `description`) VALUES
+(1, 'Lomo 7w', 'Bulbs', 'T bulb');
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `production_line`
 --
@@ -118,11 +128,23 @@ CREATE TABLE `production_report` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `product_raw_material`
+--
+
+CREATE TABLE `product_raw_material` (
+  `product_id` int(11) NOT NULL,
+  `raw_material_id` int(11) NOT NULL,
+  `quantity_required` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `raw_material`
 --
 
 CREATE TABLE `raw_material` (
-  `raw_material_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `raw_material_id` int(11) NOT NULL,
   `material_name` varchar(100) NOT NULL,
   `supplier` varchar(100) DEFAULT NULL,
   `quantity_in_stock` int(11) NOT NULL,
@@ -130,6 +152,14 @@ CREATE TABLE `raw_material` (
   `imported` tinyint(1) NOT NULL DEFAULT 0,
   `semi_finish` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `raw_material`
+--
+
+INSERT INTO `raw_material` (`raw_material_id`, `material_name`, `supplier`, `quantity_in_stock`, `import_date`, `imported`, `semi_finish`) VALUES
+(1, '7W ', 'china', 15000, '2024-11-26', 1, 0),
+(2, '7W ', 'china', 16531, '2024-11-19', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -144,6 +174,28 @@ CREATE TABLE `supervisor` (
   `contractor_id` int(11) DEFAULT NULL,
   `assigned_line` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(256) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `username`, `email`, `password_hash`) VALUES
+(1, 'abdulahad1015', 'abdulahad1015@gmail.com', '$2b$12$i5p4MPW/Jpr.ITNHhotwveWWqGLNPe8cHhpF8.Y4wYlSgBq8x4DKO'),
+(4, 'abd18', 'abdullahBinKohli18@gmail.com', '$2b$12$NfGirldNdWrzoLCXbxhH/euDRzA2CQjhHLYNyx3zCqNYmIQ4jceei'),
+(5, 'obaid18', 'obaidirfan18@gmail.com', '$2b$12$yzBl54wOGTO/LT3SrBq3tuG4HhCnz1TRb6k30WZXAkc4AJyXl4E0S');
 
 -- --------------------------------------------------------
 
@@ -213,6 +265,13 @@ ALTER TABLE `production_report`
   ADD KEY `product_id` (`product_id`);
 
 --
+-- Indexes for table `product_raw_material`
+--
+ALTER TABLE `product_raw_material`
+  ADD PRIMARY KEY (`product_id`,`raw_material_id`),
+  ADD KEY `raw_material_id` (`raw_material_id`);
+
+--
 -- Indexes for table `raw_material`
 --
 ALTER TABLE `raw_material`
@@ -227,10 +286,40 @@ ALTER TABLE `supervisor`
   ADD KEY `assigned_line` (`assigned_line`);
 
 --
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- Indexes for table `warehouse`
 --
 ALTER TABLE `warehouse`
   ADD PRIMARY KEY (`warehouse_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `product`
+--
+ALTER TABLE `product`
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `raw_material`
+--
+ALTER TABLE `raw_material`
+  MODIFY `raw_material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -266,24 +355,19 @@ ALTER TABLE `production_report`
   ADD CONSTRAINT `production_report_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`);
 
 --
+-- Constraints for table `product_raw_material`
+--
+ALTER TABLE `product_raw_material`
+  ADD CONSTRAINT `product_raw_material_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `product_raw_material_ibfk_2` FOREIGN KEY (`raw_material_id`) REFERENCES `raw_material` (`raw_material_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `supervisor`
 --
 ALTER TABLE `supervisor`
   ADD CONSTRAINT `supervisor_ibfk_1` FOREIGN KEY (`contractor_id`) REFERENCES `contractor` (`contractor_id`),
   ADD CONSTRAINT `supervisor_ibfk_2` FOREIGN KEY (`assigned_line`) REFERENCES `production_line` (`production_line_id`);
-
-CREATE TABLE `product_raw_material` (
-  `product_id` int(11) NOT NULL,
-  `raw_material_id` int(11) NOT NULL,
-  `quantity_required` int(11) NOT NULL,
-  PRIMARY KEY (`product_id`, `raw_material_id`),
-  FOREIGN KEY (`product_id`) REFERENCES `product`(`product_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`raw_material_id`) REFERENCES `raw_material`(`raw_material_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 COMMIT;
-
-
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

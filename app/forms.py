@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import *
+from wtforms.validators import Email
 from wtforms.validators import *
 from datetime import datetime
+from .models import User
 
 
 
@@ -34,12 +36,46 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired(), Length(max=50)])
     submit = SubmitField("Login")
 
-class RegisterForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Length(max=50)])
-    email = StringField("Email", validators=[DataRequired(), Length(max=100)])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField("Register")
+# class RegisterForm(FlaskForm):
+#     username = StringField("Username", validators=[DataRequired(), Length(max=50)])
+#     email = StringField("Email", validators=[DataRequired(), Length(max=100)])
+#     password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
+#     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo('password')])
+#     submit = SubmitField("Register")
+
+class SignupForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(),Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    verification_code = IntegerField('Verification Code', validators=[DataRequired()])
+    submit = SubmitField('Sign Up')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('That username is already taken.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('That email is already registered.')
+        
+    def validate_verification_code(self,verification_code):
+         # Example of retrieving OTP from the session
+        print(f"Verrification code{verification_code.data}")
+        from app.routes import session
+        otp=int(session['otp'])
+        print(f"OTP{otp}")
+        if otp is None or int(verification_code.data) != otp:
+            raise ValidationError('Invalid OTP.')
+        
+
+# class LoginForm(FlaskForm):
+#     email = StringField('Email', validators=[DataRequired(),Email()])
+#     password = PasswordField('Password', validators=[DataRequired()])
+#     submit = SubmitField('Login')
+
 
 # Add/Update Product (Added by Affan)
 class ProductForm(FlaskForm):
@@ -165,18 +201,18 @@ class RateItemForm(FlaskForm):
     submit = SubmitField("Submit Rating")
 
 
-class LoginForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Length(max=50)])
-    password = StringField("Password", validators=[DataRequired(), Length(max=50)])
-    submit = SubmitField("Login")
+# class LoginForm(FlaskForm):
+#     username = StringField("Username", validators=[DataRequired(), Length(max=50)])
+#     password = StringField("Password", validators=[DataRequired(), Length(max=50)])
+#     submit = SubmitField("Login")
 
 
-class RegisterForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Length(max=50)])
-    email = StringField("Email", validators=[DataRequired(), Length(max=100)])
-    password = StringField("Password", validators=[DataRequired(), Length(min=6)])
-    confirm_password = StringField("Confirm Password", validators=[DataRequired()])
-    submit = SubmitField("Register")
+# class RegisterForm(FlaskForm):
+#     username = StringField("Username", validators=[DataRequired(), Length(max=50)])
+#     email = StringField("Email", validators=[DataRequired(), Length(max=100)])
+#     password = StringField("Password", validators=[DataRequired(), Length(min=6)])
+#     confirm_password = StringField("Confirm Password", validators=[DataRequired()])
+#     submit = SubmitField("Register")
 
 # Add/Edit/Delete Contractor
 class AddContractorForm(FlaskForm):
@@ -237,12 +273,12 @@ class AddWarehouseForm(FlaskForm):
     warehouse_location = StringField("Warehouse Location", validators=[Length(max=100)])
     submit = SubmitField("Add Warehouse")
 
-# Add/Edit/Delete Product-Raw Material Relationship
-class AddProductRawMaterialForm(FlaskForm):
-    product_id = IntegerField("Product ID", validators=[DataRequired()])
-    raw_material_id = IntegerField("Raw Material ID", validators=[DataRequired()])
-    quantity_required = IntegerField("Quantity Required", validators=[DataRequired(), NumberRange(min=1)])
-    submit = SubmitField("Add Requirement")
+# # Add/Edit/Delete Product-Raw Material Relationship
+# class AddProductRawMaterialForm(FlaskForm):
+#     product_id = IntegerField("Product ID", validators=[DataRequired()])
+#     raw_material_id = IntegerField("Raw Material ID", validators=[DataRequired()])
+#     quantity_required = IntegerField("Quantity Required", validators=[DataRequired(), NumberRange(min=1)])
+#     submit = SubmitField("Add Requirement")
 
 # Search/Filter Forms
 class SearchRawMaterialForm(FlaskForm):

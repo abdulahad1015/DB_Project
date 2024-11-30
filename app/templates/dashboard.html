@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Home Page{% endblock %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+<h2>Statistics</h2>
+    <ul>
+        <li>Total Users: {{ data.total_users }}</li>
+        <li>Active Users: {{ data.active_users }}</li>
+        <li>New Users: {{ data.new_users }}</li>
+    </ul>
+    <h2>Roles</h2>
+    <ul>
+        {% for role, count in data.roles.items() %}
+            <li>{{ role }}: {{ count }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Recent Activity</h2>
+    <ul>
+        {% for activity in data.recent_activity %}
+            <li>{{ activity }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

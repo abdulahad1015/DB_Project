@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask,session
 from flask_sqlalchemy import SQLAlchemy
 from .config import Config
 from flask_bootstrap import Bootstrap5
@@ -30,6 +30,10 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
                           
+    @app.before_request
+    def make_session_non_permanent():
+        session.permanent = False
+
     # Import routes within app context to avoid circular imports
     with app.app_context():
         from . import routes

@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for,flash,request,get_flashed_messages,abort
+from flask import render_template, redirect, url_for,flash,request,get_flashed_messages,session,abort
 from flask_login import login_user, logout_user, login_required, current_user
 from .models import *
 from .forms import *

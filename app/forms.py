@@ -3,8 +3,7 @@ from wtforms import *
 from wtforms.validators import Email
 from wtforms.validators import *
 from datetime import datetime
-from .models import User
-
+from .models import *
 
 class AddRawMaterialForm(FlaskForm):
     material_name = StringField("Material Name")
@@ -48,14 +47,12 @@ class SignupForm(FlaskForm):
         print(f"OTP{otp}")
         if otp is None or int(verification_code.data) != otp:
             raise ValidationError('Invalid OTP.')
-        
 # Add/Update Product (Added by Affan)
 class ProductForm(FlaskForm):
     product_name = StringField("Product Name", validators=[DataRequired()])
     category = StringField("Category", validators=[Optional()])
     description = TextAreaField("Description", validators=[Optional()])
     submit = SubmitField("Add/Update Product")
-
 
 class EditRawMaterialForm(FlaskForm):
     name = StringField("Material Name", validators=[DataRequired(), Length(max=100)])
@@ -64,15 +61,36 @@ class EditRawMaterialForm(FlaskForm):
     cost = FloatField("Cost per Unit", validators=[NumberRange(min=0)])
     submit = SubmitField("Update Material")
 
-
 class WarehouseForm(FlaskForm):
     warehouse_type = SelectField('Warehouse Type', choices=[('Raw Material', 'Raw Material'), ('Finished Goods', 'Finished Goods')], validators=[DataRequired()])
     warehouse_location = StringField('Warehouse Location', validators=[DataRequired(), Length(min=2, max=100)])
     submit = SubmitField('Add Warehouse')
 
+class ContractorForm(FlaskForm):
+    # user_id = IntegerField("User ID", validators=[DataRequired()])
+    contract_start_date = DateField("Contract Start Date", format='%Y-%m-%d', validators=[DataRequired()])
+    contract_end_date = DateField("Contract End Date", format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField("Add Contractor")
 
+class ProductionLineForm(FlaskForm):
+    line_name = StringField("Line Name", validators=[DataRequired(), Length(max=50)])
+    submit = SubmitField("Add Production Line")
 
+class SupervisorForm(FlaskForm):
+    supervisor_name = StringField("Supervisor Name", validators=[DataRequired(), Length(max=100)])
+    contact_info = StringField("Contact Info", validators=[Length(max=100)])
+    contractor_id = IntegerField("Contractor ID", validators=[DataRequired()])
+    submit = SubmitField("Add Supervisor")
 
+class ProductRawMaterialForm(FlaskForm):
+    product_choices = [(product.product_id, product.product_name) for product in Product.query.all()]
+    raw_material_choices = [(raw_material.raw_material_id, raw_material.material_name) for raw_material in RawMaterial.query.all()]
+    
+    product_id = SelectField('Product', coerce=int, choices=product_choices, validators=[DataRequired()])
+    raw_material_id = SelectField('Raw Material', coerce=int, choices=raw_material_choices, validators=[DataRequired()])
+    quantity_required = IntegerField('Quantity Required', validators=[DataRequired()])
+    
+    submit = SubmitField('Save')
 
 # class SearchForm(FlaskForm):
 #     query = StringField("Search", validators=[DataRequired(), Length(max=100)])

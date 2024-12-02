@@ -10,12 +10,6 @@
         <li>Active Users: {{ data.active_users }}</li>
         <li>New Users: {{ data.new_users }}</li>
     </ul>
-    <h2>Roles</h2>
-    <ul>
-        {% for role, count in data.roles.items() %}
-            <li>{{ role }}: {{ count }}</li>
-        {% endfor %}
-    </ul>
     <h2>Recent Activity</h2>
     <ul>
         {% for activity in data.recent_activity %}

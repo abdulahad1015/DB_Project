@@ -14,53 +14,132 @@
             </li>
 
             <!-- Warehouse Dropdown -->
+            {% if 'view_warehouse' in user_permissions or 'add_warehouse' in user_permissions %}
             <li class="nav-item">
                 <a href="#" class="nav-link link-body-emphasis {% if request.endpoint in ['view_warehouse', 'add_warehouse'] %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#warehousesDropdown" aria-expanded="false">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
                     Warehouse
                 </a>
                 <ul class="collapse" id="warehousesDropdown">
+                    {% if 'view_warehouse' in user_permissions %}
                     <li><a href="{{ url_for('view_warehouse') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_warehouse' %}active{% endif %}">View Warehouses</a></li>
+                    {% endif %}
+                    {% if 'add_warehouse' in user_permissions %}
                     <li><a href="{{ url_for('add_warehouse') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'add_warehouse' %}active{% endif %}">Add Warehouse</a></li>
+                    {% endif %}
                 </ul>
             </li>
+            {% endif %}
 
             <!-- Products Dropdown -->
+            {% if 'view_products' in user_permissions or 'add_product' in user_permissions %}
             <li class="nav-item">
                 <a href="#" class="nav-link link-body-emphasis {% if request.endpoint in ['view_products', 'add_product'] %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#productsDropdown" aria-expanded="false">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
                     Products
                 </a>
                 <ul class="collapse" id="productsDropdown">
+                    {% if 'view_products' in user_permissions %}
                     <li><a href="{{ url_for('view_products') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_products' %}active{% endif %}">View Products</a></li>
+                    {% endif %}
+                    {% if 'add_product' in user_permissions %}
                     <li><a href="{{ url_for('add_product') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'add_product' %}active{% endif %}">Add Product</a></li>
+                    {% endif %}
                 </ul>
             </li>
+            {% endif %}
 
             <!-- Raw Material Dropdown -->
+            {% if 'view_raw_material' in user_permissions or 'add_raw_material' in user_permissions %}
             <li class="nav-item">
                 <a href="#" class="nav-link link-body-emphasis {% if request.endpoint in ['view_raw_material', 'add_raw_material'] %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#rawMaterialDropdown" aria-expanded="false">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#box"></use></svg>
                     Raw Material
                 </a>
                 <ul class="collapse" id="rawMaterialDropdown">
+                    {% if 'view_raw_material' in user_permissions %}
                     <li><a href="{{ url_for('view_raw_material') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_raw_material' %}active{% endif %}">View Raw Material</a></li>
+                    {% endif %}
+                    {% if 'add_raw_material' in user_permissions %}
                     <li><a href="{{ url_for('add_raw_material') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'add_raw_material' %}active{% endif %}">Add Raw Material</a></li>
+                    {% endif %}
                 </ul>
             </li>
+            {% endif %}
 
+            <!-- Contractors -->
+            {% if 'view_contractors' in user_permissions %}
             <li class="nav-item">
-                <a href="#" class="nav-link link-body-emphasis">
+                <a href="{{ url_for('view_contractors') }}" class="nav-link link-body-emphasis">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
-                    Customers
+                    Contractors 
                 </a>
             </li>
+            {% endif %}
+
+            <!-- Users Dropdown -->
+            {% if 'view_users' in user_permissions or 'add_user' in user_permissions %}
+            <li class="nav-item">
+                <a href="#" class="nav-link link-body-emphasis {% if request.endpoint in ['view_users', 'add_user'] %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#UserDropdown" aria-expanded="false">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#box"></use></svg>
+                    Users
+                </a>
+                <ul class="collapse" id="UserDropdown">
+                    {% if 'view_users' in user_permissions %}
+                    <li><a href="{{ url_for('view_users') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_users' %}active{% endif %}">View Users</a></li>
+                    {% endif %}
+                    {% if 'add_user' in user_permissions %}
+                    <li><a href="{{ url_for('add_user') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'add_user' %}active{% endif %}">Add User</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+            {% endif %}
+
+            <!-- Production Lines Dropdown -->
+            {% if 'view_production_lines' in user_permissions or 'add_production_line' in user_permissions %}
+            <li class="nav-item">
+                <a href="#" class="nav-link link-body-emphasis {% if request.endpoint in ['view_production_lines', 'add_production_line'] %}active{% endif %}" data-bs-toggle="collapse" data-bs-target="#ProductionLineDropdown" aria-expanded="false">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#box"></use></svg>
+                    Production Lines
+                </a>
+                <ul class="collapse" id="ProductionLineDropdown">
+                    {% if 'view_production_lines' in user_permissions %}
+                    <li><a href="{{ url_for('view_production_lines') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_production_lines' %}active{% endif %}">View Production Lines</a></li>
+                    {% endif %}
+                    {% if 'add_production_line' in user_permissions %}
+                    <li><a href="{{ url_for('add_production_line') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'add_production_line' %}active{% endif %}">Add Production Line</a></li>
+                    {% endif %}
+                </ul>
+            </li>
+            {% endif %}
+
+            <!-- Supervisors -->
+            {% if 'view_supervisors' in user_permissions %}
+            <li class="nav-item">
+                <a href="{{ url_for('view_supervisors') }}" class="nav-link link-body-emphasis">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                    Supervisors 
+                </a>
+            </li>
+            {% endif %}
+
+            <!-- Producr Raw Material -->
+            {% if 'view_product_raw_materials' in user_permissions %}
+            <li class="nav-item">
+                <a href="{{ url_for('view_product_raw_materials') }}" class="nav-link link-body-emphasis">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                    Product Raw Material
+                </a>
+            </li>
+            {% endif %}
+            
+
         </ul>
         <hr>
         <div class="dropdown">
             <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                <strong>mdo</strong>
+                <strong>{{ current_user.username }}</strong>
             </a>
             <ul class="dropdown-menu text-small shadow">
                 <li><a class="dropdown-item" href="#">New project...</a></li>
@@ -72,3 +151,4 @@
         </div>
     </div>
 </div>
+

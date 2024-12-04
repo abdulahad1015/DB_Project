@@ -6,11 +6,12 @@ class RawMaterial(db.Model):
     raw_material_id = db.Column(db.Integer, primary_key=True,autoincrement=True)  # Matches your schema's primary key
     material_name = db.Column(db.String(100), nullable=False)  # For material_name
     supplier = db.Column(db.String(100), nullable=True)  # For supplier, can be NULL
-    quantity_in_stock = db.Column(db.Integer, nullable=False)  # For quantity_in_stock
     import_date = db.Column(db.Date, nullable=True)  # For import_date, can be NULL
     imported = db.Column(db.Boolean, nullable=False, default=False)  # For imported (tinyint)
     semi_finish = db.Column(db.Boolean, nullable=False, default=False)  # For semi_finish (tinyint)
+
 # (Added By Affan)
+
 class Product(db.Model):
     __tablename__ = 'product'
     product_id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Matches your schema's primary key
@@ -98,3 +99,28 @@ class MaterialCollection(db.Model):
     # Relationships (optional)
     supervisor = db.relationship('Supervisor', backref='material_collections',lazy='joined')
     raw_material = db.relationship('RawMaterial', backref='material_collections',lazy='joined')
+
+
+class FinishedGoods(db.Model):
+    finished_goods_id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), nullable=False)
+    quantity_produced = db.Column(db.Integer, nullable=False)
+    warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouse.warehouse_id'), nullable=False)
+    date_stored = db.Column(db.Date, nullable=True)
+
+    # Relationships
+    product = db.relationship('Product', backref='finished_goods')
+    # warehouse = db.relationship('Warehouse', backref='finished_goods')
+
+class ProductionReport(db.Model):
+
+    report_id = db.Column(db.Integer, primary_key=True)
+    supervisor_id = db.Column(db.Integer, db.ForeignKey('supervisor.supervisor_id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), nullable=False)
+    quantity_produced = db.Column(db.Integer, nullable=False)
+    quantity_faulty = db.Column(db.Integer, nullable=True)
+    parts_issued = db.Column(db.Text, nullable=True)
+    report_date = db.Column(db.Date, nullable=True)
+
+    supervisor = db.relationship('Supervisor', backref='reports')
+    product = db.relationship('Product', backref='reports')

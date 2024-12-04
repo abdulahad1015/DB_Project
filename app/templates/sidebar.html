@@ -133,11 +133,23 @@
             </li>
             {% endif %}
 
+            <!-- Production Order -->
             {% if 'view_production_orders' in user_permissions %}
             <li class="nav-item">
                 <a href="{{ url_for('view_production_orders') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_production_orders' %}active{% endif %}">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
                     Production Order
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- Material Collection -->
+            {% if 'view_material_collections' in user_permissions %}    
+            <li class="nav-item">
+                <a href="{{ url_for('view_material_collections') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_material_collections' %}active{% endif %}">
+                    <svg class="bi pe-none
+                    me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                    Material Collection
                 </a>
             </li>
             {% endif %}

@@ -105,13 +105,29 @@ class ProductionOrderForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class MaterialCollectionForm(FlaskForm):
-    supervisor_id = SelectField('Supervisor',coerce=int,validators=[DataRequired()],choices=[])
-    raw_material_id = SelectField('Raw Material',coerce=int,validators=[DataRequired()],choices=[])
+    supervisor_id = SelectField('Supervisor',validators=[DataRequired()],choices=[])
+    raw_material_id = SelectField('Raw Material',validators=[DataRequired()],choices=[])
     quantity_collected = IntegerField('Quantity Collected',validators=[DataRequired(), NumberRange(min=1, message="Quantity must be at least 1")])
     collection_date = DateField('Collection Date', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+class FinishedGoodsForm(FlaskForm):
+    product_id = SelectField('Product',validators=[DataRequired()],choices=[])
+    quantity_produced = IntegerField('Quantity Produced',validators=[DataRequired(), NumberRange(min=1, message="Quantity must be at least 1")])
+    warehouse_id = SelectField('Warehouse',validators=[DataRequired()],choices=[])
+    date_stored = DateField('Date Stored', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
+class ProductionReportForm(FlaskForm):
+    supervisor_id = IntegerField('Supervisor ID', validators=[DataRequired()])
+    product_id = IntegerField('Product ID', validators=[DataRequired()])
+    quantity_produced = IntegerField('Quantity Produced', validators=[DataRequired()])
+    quantity_faulty = IntegerField('Quantity Faulty', validators=[Optional()])
+    parts_issued = TextAreaField('Parts Issued', validators=[Optional()])
+    report_date = DateField('Report Date', validators=[Optional()], format='%Y-%m-%d')
+    submit = SubmitField('Submit')
+
+    
 
 # class SearchForm(FlaskForm):
 #     query = StringField("Search", validators=[DataRequired(), Length(max=100)])

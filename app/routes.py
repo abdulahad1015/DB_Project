@@ -18,7 +18,9 @@ roles_permissions = {
         "view_production_lines", "add_production_line", "edit_production_line", "delete_production_line",
         "view_supervisors", "edit_supervisor", "delete_supervisor",
         "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material",
-        "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order"
+        "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order",
+        "view_material_collections", "add_material_collection", "edit_material_collection", "delete_material_collection"
+    
     ],
     "manager": [
         "view_warehouse", "add_warehouse", "edit_warehouse", "delete_warehouse",
@@ -28,7 +30,8 @@ roles_permissions = {
         "view_production_lines", "add_production_line", "edit_production_line", "delete_production_line",
         "view_supervisors", "edit_supervisor", "delete_supervisor",
         "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material",
-                "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order"
+        "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order",
+        "view_material_collections", "add_material_collection", "edit_material_collection", "delete_material_collection"
     ],
     "staff": [
         "view_warehouse", "view_products", "view_raw_material", "view_contractors",
@@ -212,7 +215,6 @@ def delete_raw_material(material_id):
 
 
 #---------------------------------------Product----------------------------------------------
-# (Added By Affan)
 @app.route('/products')
 @login_required
 def view_products():
@@ -220,7 +222,6 @@ def view_products():
     print(entries)  # Debugging: Print entries to console
     return render_template('product.html', products=entries)
 
-# Add Product (Added By Affan)
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
 @role_required('admin','manager')
@@ -238,7 +239,6 @@ def add_product():
         return redirect(url_for('view_products'))
     return render_template('form.html', form=form)
 
-# Edit Product(Added By Affan)
 @app.route('/edit_product/<int:product_id>', methods=['GET', 'POST'])
 @login_required
 @role_required('admin','manager')
@@ -254,7 +254,6 @@ def edit_product(product_id):
         return redirect(url_for('view_products'))
     return render_template('form.html', form=form, product=product)
 
-# Delete Product (Added By Affan)
 @app.route('/delete_product/<int:product_id>', methods=['POST'])
 @login_required
 @role_required('admin','manager')
@@ -361,6 +360,9 @@ def add_user():
 @login_required
 @role_required('admin')
 def edit_user(user_id):
+    if(user_id == 1):
+        flash("Cannot edit the admin user", "danger")
+        return redirect(url_for('view_users'))
     user = User.query.get_or_404(user_id)
     form = SignupForm(obj=user)
     # form._fields.pop('password')
@@ -383,6 +385,9 @@ def edit_user(user_id):
 @login_required
 @role_required('admin')
 def delete_user(user_id):
+    if(user_id == 1):
+        flash("Cannot delete the admin user", "danger")
+        return redirect(url_for('view_users'))
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
@@ -604,11 +609,16 @@ def view_production_orders():
 def add_production_order():
 
     form = ProductionOrderForm()
+
+    unavailable_supervisors = db.session.query(ProductionOrder.supervisor_id).filter_by(status='pending').all()
+    unavailable_ids = [s[0] for s in unavailable_supervisors]
+    available_supervisors = Supervisor.query.filter(~Supervisor.supervisor_id.in_(unavailable_ids)).all()
+
     # Dynamically populate the choices
     form.contractor_id.choices = [(c.contractor_id, c.user.username) for c in Contractor.query.all()]
     form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
     form.production_line_id.choices = [(pl.production_line_id, pl.line_name) for pl in ProductionLine.query.all()]
-    form.supervisor.choices = [(s.supervisor_id,s.supervisor_name) for s in Supervisor.query.all()]
+    form.supervisor.choices = [(s.supervisor_id,s.supervisor_name) for s in available_supervisors]
 
     if form.validate_on_submit():
         production_order = ProductionOrder(
@@ -633,10 +643,11 @@ def add_production_order():
 def edit_production_order(order_id):
     production_order = ProductionOrder.query.get_or_404(order_id)
     form = ProductionOrderForm(obj=production_order)
-    form.contractor_id.choices = [(c.contractor_id, c.user.username) for c in Contractor.query.all()]
+    form._fields.pop('supervisor')
+    form._fields.pop('contractor_id')
+
     form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
     form.production_line_id.choices = [(pl.production_line_id, pl.line_name) for pl in ProductionLine.query.all()]
-    form.supervisor.choices = [(s.supervisor_id,s.supervisor_name) for s in Supervisor.query.all()]
     if form.validate_on_submit():
         production_order.contractor_id = form.contractor_id.data
         production_order.product_id = form.product_id.data
@@ -729,6 +740,150 @@ def delete_material_collection(collection_id):
         flash("Cannot delete material collection: This record is referenced in other records.", "danger")
         app.logger.error(f"IntegrityError: {str(e)}")
     return redirect(url_for('view_material_collections'))
+
+#---------------------------------------Finished Goods----------------------------------------------    
+@app.route('/finished_goods')
+@login_required
+def view_finished_goods():
+    entries = FinishedGoods.query.all()
+    print(entries)
+    return render_template('finished_goods.html', finished_goods=entries)
+
+# Add Finished Goods
+@app.route('/add_finished_goods', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager')
+def add_finished_goods():
+    form = FinishedGoodsForm()
+    form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
+    form.warehouse_id.choices = [(w.warehouse_id, w.warehouse_location) for w in Warehouse.query.all()]
+    if form.validate_on_submit():
+        new_finished_goods = FinishedGoods(
+            product_id=form.product_id.data,
+            quantity_produced=form.quantity_produced.data,
+            warehouse_id=form.warehouse_id.data,
+            date_stored=form.date_stored.data
+        )
+        db.session.add(new_finished_goods)
+        db.session.commit()
+        flash("Finished goods added successfully!", "success")
+        return redirect(url_for('view_finished_goods'))
+    return render_template('form.html', form=form)
+
+# Edit Finished Goods
+@app.route('/edit_finished_goods/<int:finished_goods_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager')
+def edit_finished_goods(finished_goods_id):
+    finished_goods = FinishedGoods.query.get_or_404(finished_goods_id)
+    form = FinishedGoodsForm(obj=finished_goods)
+    form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
+    form.warehouse_id.choices = [(w.warehouse_id, w.warehouse_location) for w in Warehouse.query.all()]
+    if form.validate_on_submit():
+        finished_goods.product_id = form.product_id.data
+        finished_goods.quantity_produced = form.quantity_produced.data
+        finished_goods.warehouse_id = form.warehouse_id.data
+        finished_goods.date_stored = form.date_stored.data
+        db.session.commit()
+        flash("Finished goods updated successfully!", "success")
+        return redirect(url_for('view_finished_goods'))
+    return render_template('form.html', form=form, finished_goods=finished_goods)
+
+# Delete Finished Goods
+@app.route('/delete_finished_goods/<int:finished_goods_id>', methods=['POST'])
+@login_required
+@role_required('admin','manager')
+def delete_finished_goods(finished_goods_id):
+    finished_goods = FinishedGoods.query.get_or_404(finished_goods_id)
+    try:
+        db.session.delete(finished_goods)
+        db.session.commit()
+        flash("Finished goods deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete finished goods: This record is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
+    return redirect(url_for('view_finished_goods'))
+
+#------------------------------------Production_Report----------------------------------------------
+@app.route('/production_report')
+@login_required
+def view_production_report():
+    entries = ProductionReport.query.all()
+    print(entries)
+    return render_template('production_report.html', production_reports=entries)
+
+class ProductionReportForm(FlaskForm):
+    supervisor_id = IntegerField('Supervisor ID', validators=[DataRequired()])
+    product_id = IntegerField('Product ID', validators=[DataRequired()])
+    quantity_produced = IntegerField('Quantity Produced', validators=[DataRequired()])
+    quantity_faulty = IntegerField('Quantity Faulty', validators=[Optional()])
+    parts_issued = TextAreaField('Parts Issued', validators=[Optional()])
+    report_date = DateField('Report Date', validators=[Optional()], format='%Y-%m-%d')
+    submit = SubmitField('Submit')
+
+
+# Add Production Report
+@app.route('/add_production_report', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager','supervisor')
+def add_production_report():
+    form = ProductionReportForm()
+    form.supervisor_id.choices = [(s.supervisor_id, s.supervisor_name) for s in Supervisor.query.all()]
+    form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
+    if form.validate_on_submit():
+        new_production_report = ProductionReport(
+            supervisor_id=form.supervisor_id.data,
+            product_id=form.product_id.data,
+            quantity_produced=form.quantity_produced.data,
+            quantity_faulty=form.quantity_faulty.data,
+            parts_issued=form.parts_issued.data,
+            report_date=form.report_date.data
+        )
+        db.session.add(new_production_report)
+        db.session.commit()
+        flash("Production report added successfully!", "success")
+        return redirect(url_for('view_production_report'))
+    return render_template('form.html', form=form)
+
+# Edit Production Report
+@app.route('/edit_production_report/<int:report_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager','supervisor')
+def edit_production_report(report_id):
+    production_report = ProductionReport.query.get_or_404(report_id)
+    form = ProductionReportForm(obj=production_report)
+    form.supervisor_id.choices = [(s.supervisor_id, s.supervisor_name) for s in Supervisor.query.all()]
+    form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
+    if form.validate_on_submit():
+        production_report.supervisor_id = form.supervisor_id.data
+        production_report.product_id = form.product_id.data
+        production_report.quantity_produced = form.quantity_produced.data
+        production_report.quantity_faulty = form.quantity_faulty.data
+        production_report.parts_issued = form.parts_issued.data
+        production_report.report_date = form.report_date.data
+        db.session.commit()
+        flash("Production report updated successfully!", "success")
+        return redirect(url_for('view_production_report'))
+    return render_template('form.html', form=form, production_report=production_report)
+
+# Delete Production Report
+@app.route('/delete_production_report/<int:report_id>', methods=['POST'])
+@login_required
+@role_required('admin','manager','supervisor')
+def delete_production_report(report_id):
+    production_report = ProductionReport.query.get_or_404(report_id)
+    try:
+        db.session.delete(production_report)
+        db.session.commit()
+        flash("Production report deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete production report: This record is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
+    return redirect(url_for('view_production_report'))
+
+
 
 #---------------------------------------Profile----------------------------------------------
 # @app.route('/profile')

@@ -116,19 +116,28 @@
             <!-- Supervisors -->
             {% if 'view_supervisors' in user_permissions %}
             <li class="nav-item">
-                <a href="{{ url_for('view_supervisors') }}" class="nav-link link-body-emphasis">
+                <a href="{{ url_for('view_supervisors') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_supervisors' %}active{% endif %}">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
                     Supervisors 
                 </a>
             </li>
             {% endif %}
 
-            <!-- Producr Raw Material -->
+            <!-- Product Raw Material -->
             {% if 'view_product_raw_materials' in user_permissions %}
             <li class="nav-item">
-                <a href="{{ url_for('view_product_raw_materials') }}" class="nav-link link-body-emphasis">
+                <a href="{{ url_for('view_product_raw_materials') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_product_raw_materials' %}active{% endif %}">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
                     Product Raw Material
+                </a>
+            </li>
+            {% endif %}
+
+            {% if 'view_production_orders' in user_permissions %}
+            <li class="nav-item">
+                <a href="{{ url_for('view_production_orders') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_production_orders' %}active{% endif %}">
+                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                    Production Order
                 </a>
             </li>
             {% endif %}

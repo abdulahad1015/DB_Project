@@ -43,7 +43,7 @@ class Contractor(db.Model):
     contract_end_date = db.Column(db.Date, nullable=True)
 
     # Relationship to the User table
-    user = db.relationship('User', backref=db.backref('contractor', uselist=False), lazy=True)
+    user = db.relationship('User', backref=db.backref('contractor', uselist=False), lazy='joined')
 
 class ProductionLine(db.Model):
     production_line_id = db.Column(db.Integer, primary_key=True)
@@ -66,5 +66,35 @@ class ProductRawMaterial(db.Model):
     quantity_required = db.Column(db.Integer, nullable=False)
 
     # Relationship with Product and RawMaterial
-    product = db.relationship('Product', backref=db.backref('product_raw_materials', lazy=True))
-    raw_material = db.relationship('RawMaterial', backref=db.backref('product_raw_materials', lazy=True))
+    product = db.relationship('Product', backref=db.backref('product_raw_materials', lazy='joined'))
+    raw_material = db.relationship('RawMaterial', backref=db.backref('product_raw_materials', lazy='joined'))
+
+
+
+class ProductionOrder(db.Model):
+    order_id = db.Column(db.Integer, primary_key=True)
+    contractor_id = db.Column(db.Integer, db.ForeignKey('contractor.contractor_id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), nullable=False)
+    quantity_ordered = db.Column(db.Integer, nullable=False)
+    start_date = db.Column(db.Date, nullable=True)
+    end_date = db.Column(db.Date, nullable=True)
+    production_line_id = db.Column(db.Integer, db.ForeignKey('production_line.production_line_id'), nullable=False)
+    supervisor_id = db.Column(db.Integer, db.ForeignKey('supervisor.supervisor_id'), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default='pending')
+
+    # Relationships for easier navigation
+    contractor = db.relationship('Contractor', backref='production_orders', lazy='joined')
+    product = db.relationship('Product', backref='production_orders', lazy='joined')
+    production_line = db.relationship('ProductionLine', backref='production_orders', lazy='joined')
+    supervisor = db.relationship('Supervisor', backref='production_orders', lazy='joined')
+
+class MaterialCollection(db.Model):
+    collection_id = db.Column(db.Integer, primary_key=True)
+    supervisor_id = db.Column(db.Integer, db.ForeignKey('supervisor.supervisor_id'), nullable=False)
+    raw_material_id = db.Column(db.Integer, db.ForeignKey('raw_material.raw_material_id'), nullable=False)
+    quantity_collected = db.Column(db.Integer, nullable=False)
+    collection_date = db.Column(db.Date)
+
+    # Relationships (optional)
+    supervisor = db.relationship('Supervisor', backref='material_collections',lazy='joined')
+    raw_material = db.relationship('RawMaterial', backref='material_collections',lazy='joined')

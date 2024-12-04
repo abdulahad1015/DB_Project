@@ -92,6 +92,27 @@ class ProductRawMaterialForm(FlaskForm):
     
     submit = SubmitField('Save')
 
+class ProductionOrderForm(FlaskForm):
+
+    contractor_id = SelectField('Contractor',coerce=int,validators=[DataRequired()],choices=[] )
+    product_id = SelectField('Product',coerce=int,validators=[DataRequired()],choices=[])
+    quantity_ordered = IntegerField('Quantity Ordered',validators=[DataRequired(), NumberRange(min=1, message="Quantity must be at least 1")])
+    start_date = DateField('Start Date', validators=[Optional()])
+    end_date = DateField('End Date', validators=[Optional()])
+    production_line_id = SelectField('Production Line',coerce=int,validators=[DataRequired()],choices=[]  )
+    supervisor = SelectField('Supervisor',validators=[DataRequired()],choices=[])
+    status = SelectField('Status',choices=[('Pending','Pending'),('Completed','Completed')],validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class MaterialCollectionForm(FlaskForm):
+    supervisor_id = SelectField('Supervisor',coerce=int,validators=[DataRequired()],choices=[])
+    raw_material_id = SelectField('Raw Material',coerce=int,validators=[DataRequired()],choices=[])
+    quantity_collected = IntegerField('Quantity Collected',validators=[DataRequired(), NumberRange(min=1, message="Quantity must be at least 1")])
+    collection_date = DateField('Collection Date', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+
+
 # class SearchForm(FlaskForm):
 #     query = StringField("Search", validators=[DataRequired(), Length(max=100)])
 #     submit = SubmitField("Search")

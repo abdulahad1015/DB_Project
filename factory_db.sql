@@ -39,7 +39,7 @@ CREATE TABLE `contractor` (
 --
 
 INSERT INTO `contractor` (`contractor_id`, `user_id`, `contract_start_date`, `contract_end_date`) VALUES
-(3, 15, NULL, NULL);
+(1, 15, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -121,7 +121,8 @@ CREATE TABLE `production_order` (
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
   `production_line_id` int(11) NOT NULL,
-  `supervisor_id` int(11) NOT NULL
+  `supervisor_id` int(11) NOT NULL,
+  `status` varchar(50) DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -157,8 +158,7 @@ CREATE TABLE `product_raw_material` (
 --
 
 INSERT INTO `product_raw_material` (`product_id`, `raw_material_id`, `quantity_required`) VALUES
-(1, 1, 5),
-(1, 2, 1);
+(1, 1, 5);
 
 -- --------------------------------------------------------
 
@@ -181,8 +181,7 @@ CREATE TABLE `raw_material` (
 --
 
 INSERT INTO `raw_material` (`raw_material_id`, `material_name`, `supplier`, `quantity_in_stock`, `import_date`, `imported`, `semi_finish`) VALUES
-(1, '7W ', 'china', 15000, '2024-11-26', 1, 0),
-(2, '7W ', 'china', 16531, '2024-11-19', 1, 0);
+(1, '7W ', 'china', 15000, '2024-11-26', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -218,9 +217,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `username`, `email`, `password_hash`, `role`) VALUES
-(1, 'abdulahad1015', 'abdulahad1015@gmail.com', '$2b$12$i5p4MPW/Jpr.ITNHhotwveWWqGLNPe8cHhpF8.Y4wYlSgBq8x4DKO', 'admin'),
-(2, 'abd18', 'abdullahBinKohli18@gmail.com', '$2b$12$NfGirldNdWrzoLCXbxhH/euDRzA2CQjhHLYNyx3zCqNYmIQ4jceei', 'manager'),
-(3, 'abdul_ahad56', 'abdulahad1015wewew@gmail.com', '$2b$12$DJaDnl2cm6b/icd7OZTSN.zW05MH1wJLMf2qkpCKwgfCIpTrZRw6i', 'contractor');
+(1, 'abdulahad1015', 'abdulahad1015@gmail.com', '$2b$12$i5p4MPW/Jpr.ITNHhotwveWWqGLNPe8cHhpF8.Y4wYlSgBq8x4DKO', 'admin');
 
 -- --------------------------------------------------------
 
@@ -340,31 +337,31 @@ ALTER TABLE `warehouse`
 -- AUTO_INCREMENT for table `contractor`
 --
 ALTER TABLE `contractor`
-  MODIFY `contractor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `contractor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `raw_material`
 --
 ALTER TABLE `raw_material`
-  MODIFY `raw_material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `raw_material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT for table `warehouse`
 --
 ALTER TABLE `warehouse`
-  MODIFY `warehouse_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `warehouse_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- Constraints for dumped tables

@@ -6,6 +6,7 @@ from . import db
 from flask import current_app as app
 from .email_otp import send_otp
 from functools import wraps
+from sqlalchemy.exc import IntegrityError
 
 roles_permissions = {
     "admin": [
@@ -16,7 +17,8 @@ roles_permissions = {
         "view_contractors", "edit_contractor", "delete_contractor",
         "view_production_lines", "add_production_line", "edit_production_line", "delete_production_line",
         "view_supervisors", "edit_supervisor", "delete_supervisor",
-        "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material"
+        "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material",
+        "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order"
     ],
     "manager": [
         "view_warehouse", "add_warehouse", "edit_warehouse", "delete_warehouse",
@@ -25,7 +27,8 @@ roles_permissions = {
         "view_contractors", "edit_contractor", "delete_contractor",
         "view_production_lines", "add_production_line", "edit_production_line", "delete_production_line",
         "view_supervisors", "edit_supervisor", "delete_supervisor",
-        "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material"
+        "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material",
+                "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order"
     ],
     "staff": [
         "view_warehouse", "view_products", "view_raw_material", "view_contractors",
@@ -91,7 +94,7 @@ def signup():
         flash('Login successful!', 'success')
         return redirect(url_for('dashboard'))
     
-    session['otp'] = send_otp()
+    session['otp'] = send_otp("k224353@nu.edu.pk")
     return render_template('signup.html', form=form)
 
 
@@ -419,9 +422,15 @@ def edit_contractor(contractor_id):
 @role_required('admin','manager')
 def delete_contractor(contractor_id):
     contractor = Contractor.query.get_or_404(contractor_id)
-    db.session.delete(contractor)
-    db.session.commit()
-    flash("Contractor deleted successfully!", "success")
+    try:
+        db.session.delete(contractor)
+        db.session.commit()
+        flash("Contractor deleted successfully.", "success")
+    except IntegrityError as e:
+        db.session.rollback()  # Roll back the transaction to keep the DB in a valid state
+        flash("Cannot delete contractor: This contractor is referenced in other records.", "danger")
+        # Log the error for debugging (optional)
+        app.logger.error(f"IntegrityError: {str(e)}")
     return redirect(url_for('view_contractors'))
 
 
@@ -508,9 +517,14 @@ def edit_supervisor(supervisor_id):
 @role_required('admin','manager')
 def delete_supervisor(supervisor_id):
     supervisor = Supervisor.query.get_or_404(supervisor_id)
-    db.session.delete(supervisor)
-    db.session.commit()
-    flash("Supervisor deleted successfully!", "success")
+    try:
+        db.session.delete(supervisor)
+        db.session.commit()
+        flash("Supervisor deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete supervisor: This supervisor is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
     return redirect(url_for('view_supervisors'))
 
 #---------------------------------------Product Raw Material----------------------------------------------
@@ -562,10 +576,159 @@ def edit_product_raw_material(product_id, raw_material_id):
 @role_required('admin','manager')
 def delete_product_raw_material(product_id, raw_material_id):
     product_raw_material = ProductRawMaterial.query.get_or_404((product_id, raw_material_id))
-    db.session.delete(product_raw_material)
-    db.session.commit()
-    flash("Product raw material deleted successfully!", "success")
+    try:
+        db.session.delete(product_raw_material)
+        db.session.commit()
+        flash("Product raw material deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete product raw material: This record is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
+
     return redirect(url_for('view_product_raw_materials'))
+
+#---------------------------------------Production Order----------------------------------------------
+
+@app.route('/production_orders')
+@login_required
+@role_required('admin','manager')
+def view_production_orders():
+    entries = ProductionOrder.query.all()
+    print(entries)
+    return render_template('production_order.html', production_orders=entries)
+
+# Add Production Order
+@app.route('/add_production_order', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager')
+def add_production_order():
+
+    form = ProductionOrderForm()
+    # Dynamically populate the choices
+    form.contractor_id.choices = [(c.contractor_id, c.user.username) for c in Contractor.query.all()]
+    form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
+    form.production_line_id.choices = [(pl.production_line_id, pl.line_name) for pl in ProductionLine.query.all()]
+    form.supervisor.choices = [(s.supervisor_id,s.supervisor_name) for s in Supervisor.query.all()]
+
+    if form.validate_on_submit():
+        production_order = ProductionOrder(
+            contractor_id=form.contractor_id.data,
+            product_id=form.product_id.data,
+            quantity_ordered=form.quantity_ordered.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            production_line_id=form.production_line_id.data,
+            supervisor_id=form.supervisor.data
+        )
+        db.session.add(production_order)
+        db.session.commit()
+        return redirect(url_for('view_production_orders'))  # Redirect to a relevant page
+
+    return render_template('form.html', form=form)
+
+# Edit Production Order
+@app.route('/edit_production_order/<int:order_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager')
+def edit_production_order(order_id):
+    production_order = ProductionOrder.query.get_or_404(order_id)
+    form = ProductionOrderForm(obj=production_order)
+    form.contractor_id.choices = [(c.contractor_id, c.user.username) for c in Contractor.query.all()]
+    form.product_id.choices = [(p.product_id, p.product_name) for p in Product.query.all()]
+    form.production_line_id.choices = [(pl.production_line_id, pl.line_name) for pl in ProductionLine.query.all()]
+    form.supervisor.choices = [(s.supervisor_id,s.supervisor_name) for s in Supervisor.query.all()]
+    if form.validate_on_submit():
+        production_order.contractor_id = form.contractor_id.data
+        production_order.product_id = form.product_id.data
+        production_order.quantity_ordered = form.quantity_ordered.data
+        production_order.start_date = form.start_date.data
+        production_order.end_date = form.end_date.data
+        production_order.production_line_id = form.production_line_id.data
+        production_order.supervisor_id = form.supervisor.data
+        db.session.commit()
+        return redirect(url_for('view_production_orders'))
+    return render_template('form.html', form=form, production_order=production_order)
+
+# Delete Production Order
+@app.route('/delete_production_order/<int:order_id>', methods=['POST'])
+@login_required
+@role_required('admin','manager')
+def delete_production_order(order_id):
+    production_order = ProductionOrder.query.get_or_404(order_id)
+    
+    try:
+        db.session.delete(production_order)
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete production order: This order is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
+
+    return redirect(url_for('view_production_orders'))
+
+#---------------------------------------Material Collection----------------------------------------------
+@app.route('/material_collections')
+@login_required
+def view_material_collections():
+    entries = MaterialCollection.query.all()
+    print(entries)
+    return render_template('material_collection.html', material_collections=entries)
+
+# Add Material Collection
+@app.route('/add_material_collection', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager')
+def add_material_collection():
+    form = MaterialCollectionForm()
+    form.supervisor_id.choices = [(s.supervisor_id, s.supervisor_name) for s in Supervisor.query.all()]
+    form.raw_material_id.choices = [(r.raw_material_id, r.material_name) for r in RawMaterial.query.all()]
+    if form.validate_on_submit():
+        new_material_collection = MaterialCollection(
+            supervisor_id=form.supervisor_id.data,
+            raw_material_id=form.raw_material_id.data,
+            quantity_collected=form.quantity_collected.data,
+            collection_date=form.collection_date.data
+        )
+        db.session.add(new_material_collection)
+        db.session.commit()
+        flash("Material collection added successfully!", "success")
+        return redirect(url_for('view_material_collections'))
+    return render_template('form.html', form=form)
+
+# Edit Material Collection
+@app.route('/edit_material_collection/<int:collection_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('admin','manager')
+def edit_material_collection(collection_id):
+    material_collection = MaterialCollection.query.get_or_404(collection_id)
+    form = MaterialCollectionForm(obj=material_collection)
+    form.supervisor_id.choices = [(s.supervisor_id, s.supervisor_name) for s in Supervisor.query.all()]
+    form.raw_material_id.choices = [(r.raw_material_id, r.material_name) for r in RawMaterial.query.all()]
+    if form.validate_on_submit():
+        material_collection.supervisor_id = form.supervisor_id.data
+        material_collection.raw_material_id = form.raw_material_id.data
+        material_collection.quantity_collected = form.quantity_collected.data
+        material_collection.collection_date = form.collection_date.data
+        db.session.commit()
+        flash("Material collection updated successfully!", "success")
+        return redirect(url_for('view_material_collections'))
+    return render_template('form.html', form=form, material_collection=material_collection)
+
+# Delete Material Collection
+@app.route('/delete_material_collection/<int:collection_id>', methods=['POST'])
+@login_required
+@role_required('admin','manager')
+def delete_material_collection(collection_id):
+    material_collection = MaterialCollection.query.get_or_404(collection_id)
+    try:
+        db.session.delete(material_collection)
+        db.session.commit()
+        flash("Material collection deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete material collection: This record is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
+    return redirect(url_for('view_material_collections'))
 
 #---------------------------------------Profile----------------------------------------------
 # @app.route('/profile')

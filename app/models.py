@@ -10,7 +10,6 @@ class RawMaterial(db.Model):
     imported = db.Column(db.Boolean, nullable=False, default=False)  # For imported (tinyint)
     semi_finish = db.Column(db.Boolean, nullable=False, default=False)  # For semi_finish (tinyint)
 
-# (Added By Affan)
 
 class Product(db.Model):
     __tablename__ = 'product'

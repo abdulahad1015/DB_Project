@@ -19,7 +19,9 @@ roles_permissions = {
         "view_supervisors", "edit_supervisor", "delete_supervisor",
         "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material",
         "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order",
-        "view_material_collections", "add_material_collection", "edit_material_collection", "delete_material_collection"
+        "view_material_collections", "add_material_collection", "edit_material_collection", "delete_material_collection",
+        "view_finished_goods", "add_finished_goods", "edit_finished_goods", "delete_finished_goods",
+        "view_production_report", "add_production_report", "edit_production_report", "delete_production_report",
     
     ],
     "manager": [
@@ -31,7 +33,8 @@ roles_permissions = {
         "view_supervisors", "edit_supervisor", "delete_supervisor",
         "view_product_raw_materials", "add_product_raw_material", "edit_product_raw_material", "delete_product_raw_material",
         "view_production_orders", "add_production_order", "edit_production_order", "delete_production_order",
-        "view_material_collections", "add_material_collection", "edit_material_collection", "delete_material_collection"
+        "view_material_collections", "add_material_collection", "edit_material_collection", "delete_material_collection",
+        "view_finished_goods", "add_finished_goods", "edit_finished_goods", "delete_finished_goods",
     ],
     "staff": [
         "view_warehouse", "view_products", "view_raw_material", "view_contractors",
@@ -77,7 +80,7 @@ def signup():
     if request.method == 'POST':
 
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data)
+            user = User(username=form.username.data, email=form.email.data, role=form.role.data)
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
@@ -168,7 +171,7 @@ def add_raw_material():
         new_material = RawMaterial(
             material_name=form.material_name.data,
             supplier=form.supplier.data,
-            quantity_in_stock=form.quantity_in_stock.data,
+            # quantity_in_stock=form.quantity_in_stock.data,
             import_date=form.import_date.data,
             imported=form.imported.data,
             semi_finish=form.semi_finish.data
@@ -189,13 +192,15 @@ def edit_raw_material(material_id):
     material = RawMaterial.query.get_or_404(material_id)
     form = AddRawMaterialForm(obj=material)
     if form.validate_on_submit():
-        material.name = form.name.data
-        material.description = form.description.data
-        material.quantity = form.quantity.data
-        material.cost = form.cost.data
+        material.material_name=form.material_name.data,
+        material.supplier=form.supplier.data,
+        material.quantity_in_stock=form.quantity_in_stock.data,
+        material.import_date=form.import_date.data,
+        material.imported=form.imported.data,
+        material.semi_finish=form.semi_finish.data
         db.session.commit()
         flash("Raw material updated successfully!", "success")
-        return redirect(url_for('home'))
+        return redirect(url_for('view_raw_material'))
     return render_template('form.html', form=form, material=material)
 
 # Delete Raw Material
@@ -205,13 +210,15 @@ def edit_raw_material(material_id):
 def delete_raw_material(material_id):
     material = RawMaterial.query.get_or_404(material_id)
     dependencies = ProductRawMaterial.query.filter_by(raw_material_id=material_id).all()
-    if dependencies:
-        flash('Cannot delete raw material. It is currently being used in one or more products.', 'warning')
-        return redirect(url_for('view_raw_material'))
-    db.session.delete(material)
-    db.session.commit()
-    flash("Raw material deleted successfully!", "success")
-    return redirect(url_for('home'))
+    try:
+        db.session.delete(material)
+        db.session.commit()
+        flash("Raw material deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete raw material: This material is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
+    return redirect(url_for('view_raw_material'))
 
 
 #---------------------------------------Product----------------------------------------------
@@ -315,9 +322,14 @@ def edit_warehouse(warehouse_id):
 @role_required('admin','manager')
 def delete_warehouse(warehouse_id):
     warehouse = Warehouse.query.get_or_404(warehouse_id)
-    db.session.delete(warehouse)
-    db.session.commit()
-    flash("Warehouse deleted successfully!", "success")
+    try:
+        db.session.delete(warehouse)
+        db.session.commit()
+        flash("Warehouse deleted successfully!", "success")
+    except IntegrityError as e:
+        db.session.rollback()
+        flash("Cannot delete warehouse: This warehouse is referenced in other records.", "danger")
+        app.logger.error(f"IntegrityError: {str(e)}")
     return redirect(url_for('view_warehouse'))
 
 #---------------------------------------User----------------------------------------------
@@ -813,14 +825,6 @@ def view_production_report():
     print(entries)
     return render_template('production_report.html', production_reports=entries)
 
-class ProductionReportForm(FlaskForm):
-    supervisor_id = IntegerField('Supervisor ID', validators=[DataRequired()])
-    product_id = IntegerField('Product ID', validators=[DataRequired()])
-    quantity_produced = IntegerField('Quantity Produced', validators=[DataRequired()])
-    quantity_faulty = IntegerField('Quantity Faulty', validators=[Optional()])
-    parts_issued = TextAreaField('Parts Issued', validators=[Optional()])
-    report_date = DateField('Report Date', validators=[Optional()], format='%Y-%m-%d')
-    submit = SubmitField('Submit')
 
 
 # Add Production Report

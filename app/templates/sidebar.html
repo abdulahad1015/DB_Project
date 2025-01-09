@@ -155,6 +155,19 @@
             {% endif %}
             
 
+
+            <!--Finished Goods-->
+            {% if 'view_finished_goods' in user_permissions %}
+            <li class="nav-item">
+                <a href="{{ url_for('view_finished_goods') }}" class="nav-link link-body-emphasis {% if request.endpoint == 'view_finished_goods' %}active{% endif %}">
+                    <svg class="bi pe-none
+                    me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                    Finished Goods
+                </a>
+            </li>
+            {% endif %}
+
+
         </ul>
         <hr>
         <div class="dropdown">

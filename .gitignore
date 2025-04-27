@@ -1,2 +1,5 @@
 .venv
 .env
+app/__pycache__/*.pcy
+app/__pycache__/*.cpython-39.pyc
+./app/__pycache__/*.cpython-39.pyc

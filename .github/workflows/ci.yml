@@ -14,6 +14,7 @@ on:
 jobs:
   build-test-scan-publish:
     runs-on: ubuntu-latest
+    environment: DB_ENV   
 
     permissions:
       contents: read
@@ -75,3 +76,14 @@ jobs:
         run: |
           docker push ${{ env.name }}:latest
           docker push ${{ env.name }}:${{ github.sha }}
+
+
+      - name: Deploy via SSH to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker compose down
+            docker compose up

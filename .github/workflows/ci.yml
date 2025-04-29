@@ -78,6 +78,7 @@ jobs:
           docker push ${{ env.name }}:${{ github.sha }}
 
 
+
       - name: Deploy via SSH to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:

@@ -1,31 +1,8 @@
 services:
-  mysql-db:
-    image: mysql:5.7
-    container_name: mysql-db
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: factory_db
-    ports:
-      - "3307:3306"
-    volumes:
-      - ./factory_db.sql:/docker-entrypoint-initdb.d/factory_db.sql
-    networks:
-      - flask-network
-      
   flask-app:
-    build: .
+    image: ghcr.io/abdulahad1015/db_project:latest
     container_name: flask-app
     ports:
-      - "5000:5000"
-    depends_on:
-      - mysql-db
+      - "80:5000"
     environment:
-      - DATABASE_URI=mysql://root:rootpassword@mysql-db:3306/factory_db
-    volumes:
-      - .:/app
-    networks:
-      - flask-network
-
-networks:
-  flask-network:
-    driver: bridge
+      - DATABASE_URI=DB_URL

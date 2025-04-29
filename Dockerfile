@@ -10,10 +10,6 @@ COPY . .
 
 EXPOSE 5000
 
-COPY wait-for-mysql.sh /usr/local/bin/wait-for-mysql.sh
-
-RUN chmod +x /usr/local/bin/wait-for-mysql.sh
-
 LABEL org.opencontainers.image.source=https://github.com/abdulahad1015/DB_Project
 
-ENTRYPOINT ["bash", "-c", "/usr/local/bin/wait-for-mysql.sh && python run.py"]
+ENTRYPOINT ["bash", "-c", "python run.py"]

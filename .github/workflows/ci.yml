@@ -1,0 +1,77 @@
+name: CI Pipeline
+
+on:
+  # ───────── Triggers ─────────
+  push:
+    branches:          # ← direct commits
+      - main
+      - dev            # ← add any extra branch you like
+  pull_request:        # ← PRs into these branches
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-test-scan-publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write          # needed to push to GHCR
+
+    steps:
+      # 0 Set lowercase image name
+      - name: Set lowercase image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      # 1 Checkout the repo
+      - uses: actions/checkout@v4
+
+      # 2 Set up Python
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # 3 Cache pip (speed up install)
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      # 4 Install dependencies + run tests
+      - name: Install dependencies and run tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pytest
+
+      # 5 Build Docker image (tagged latest and commit SHA)
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ env.name }}:latest \
+            -t ${{ env.name }}:${{ github.sha }} .
+
+      # 6 Security scan using Trivy
+      - name: Scan image with Trivy
+        run: |
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+                aquasec/trivy:latest image \
+                --severity HIGH,CRITICAL \
+                --ignore-unfixed \
+                ${{ env.name }}:${{ github.sha }}
+
+      # 7 Login to GitHub Container Registry (GHCR)
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 8 Push both image tags
+      - name: Push Docker image to GHCR
+        run: |
+          docker push ${{ env.name }}:latest
+          docker push ${{ env.name }}:${{ github.sha }}

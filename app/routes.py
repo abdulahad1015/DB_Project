@@ -171,7 +171,7 @@ def add_raw_material():
         new_material = RawMaterial(
             material_name=form.material_name.data,
             supplier=form.supplier.data,
-            # quantity_in_stock=form.quantity_in_stock.data,
+            quantity_in_stock=form.quantity_in_stock.data,
             import_date=form.import_date.data,
             imported=form.imported.data,
             semi_finish=form.semi_finish.data

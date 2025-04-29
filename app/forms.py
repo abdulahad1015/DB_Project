@@ -8,7 +8,7 @@ from .models import *
 class AddRawMaterialForm(FlaskForm):
     material_name = StringField("Material Name")
     supplier = StringField("Supplier")
-    quantity_in_stock = IntegerField("Quantity in Stock")
+    quantity_in_stock = IntegerField("Quantity in Stock",default=0,validators=[NumberRange(min=0)])
     import_date = DateField("Import Date")
     imported = BooleanField("Imported")
     semi_finish = BooleanField("Semi-Finished")

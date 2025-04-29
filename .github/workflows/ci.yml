@@ -75,3 +75,19 @@ jobs:
         run: |
           docker push ${{ env.name }}:latest
           docker push ${{ env.name }}:${{ github.sha }}
+
+
+          
+      - name: Deploy via SSH to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker rm -f db_project_container || true
+            docker pull ghcr.io/abdulahad1015/db_project:latest
+            docker run -d \
+              --name db_project_container \
+              -p 80:5000 \
+              ghcr.io/abdulahad1015/db_project:latest

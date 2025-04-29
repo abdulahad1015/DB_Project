@@ -9,7 +9,7 @@ class RawMaterial(db.Model):
     import_date = db.Column(db.Date, nullable=True)  # For import_date, can be NULL
     imported = db.Column(db.Boolean, nullable=False, default=False)  # For imported (tinyint)
     semi_finish = db.Column(db.Boolean, nullable=False, default=False)  # For semi_finish (tinyint)
-
+    quantity_in_stock = db.Column(db.Integer, nullable=False)  # For quantity (int)
 
 class Product(db.Model):
     __tablename__ = 'product'

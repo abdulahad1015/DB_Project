@@ -1,4 +1,3 @@
-```yaml
 name: Bug Report
 description: Report a bug in the Factory Management System
 title: "[Bug] <Short description of the issue>"
@@ -72,4 +71,3 @@ body:
       placeholder: e.g., latest, commit abc123
     validations:
       required: false
-```

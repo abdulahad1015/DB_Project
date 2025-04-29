@@ -1,4 +1,3 @@
-```yaml
 name: Feature Request
 description: Suggest a new feature for the Factory Management System
 title: "[Feature] <Short description of the feature>"
@@ -54,4 +53,3 @@ body:
       placeholder: e.g., Using an external BI tool instead of a custom dashboard
     validations:
       required: false
-```

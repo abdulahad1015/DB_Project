@@ -1,4 +1,3 @@
-```yaml
 name: Documentation Improvement
 description: Suggest improvements to the project documentation
 title: "[Docs] <Short description of the improvement>"
@@ -41,4 +40,3 @@ body:
       placeholder: e.g., Include a sample RDS connection string
     validations:
       required: false
-```

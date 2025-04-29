@@ -1,0 +1,42 @@
+name: Documentation Improvement
+description: Suggest improvements to the project documentation
+title: "[Docs] <Short description of the improvement>"
+labels: ["documentation"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve the Factory Management System documentation! Please provide details about the suggested changes.
+  - type: textarea
+    id: description
+    attributes:
+      label: Documentation Issue
+      description: Describe the issue or gap in the current documentation.
+      placeholder: e.g., README lacks instructions for setting up AWS RDS
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed Changes
+      description: Suggest specific changes or additions.
+      placeholder: e.g., Add a section to README with steps to configure RDS connection
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location
+      description: Where is the documentation that needs improvement? (e.g., file, section)
+      placeholder: e.g., README.md, Deployment section
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any additional information or examples to support your suggestion.
+      placeholder: e.g., Include a sample RDS connection string
+    validations:
+      required: false

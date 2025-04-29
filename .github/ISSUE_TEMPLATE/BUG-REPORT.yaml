@@ -1,0 +1,73 @@
+name: Bug Report
+description: Report a bug in the Factory Management System
+title: "[Bug] <Short description of the issue>"
+labels: ["bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug in the Factory Management System! Please provide detailed information to help us resolve it quickly.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Where did you encounter the bug? (e.g., local dev, AWS EC2, specific browser)
+      placeholder: e.g., Local dev with Python 3.9, Chrome 120
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: e.g., Clicking 'Add Inventory' button causes 500 error
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reproduce the bug.
+      placeholder: |
+        1. Navigate to /inventory
+        2. Fill form with item=Widget, quantity=100
+        3. Click Submit
+        4. Observe error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: e.g., Item should be added to inventory with success message
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: e.g., Server returns 500 Internal Server Error
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or Screenshots
+      description: Attach relevant logs, screenshots, or error messages (use ``` for code blocks).
+      placeholder: |
+        ```
+        Flask Error: TypeError: 'NoneType' object is not subscriptable
+        ```
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Project Version
+      description: Which version of the app are you using? (e.g., commit hash, Docker tag)
+      placeholder: e.g., latest, commit abc123
+    validations:
+      required: false

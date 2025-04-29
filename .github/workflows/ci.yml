@@ -5,11 +5,11 @@ on:
   push:
     branches:          # ← direct commits
       - main
-      - dev            # ← add any extra branch you like
+      - dev2            # ← add any extra branch you like
   pull_request:        # ← PRs into these branches
     branches:
       - main
-      - dev
+      - dev2
 
 jobs:
   build-test-scan-publish:

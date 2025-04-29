@@ -179,9 +179,13 @@ def add_raw_material():
             supplier=form.supplier.data,
             quantity_in_stock=form.quantity_in_stock.data,
             import_date=form.import_date.data,
-            imported=form.imported.data,
-            semi_finish=form.semi_finish.data
+            # imported= (form.imported.data) ,
+            # semi_finish= (form.semi_finish.data) ,
         )
+
+        # RawMaterial.material_name=form.material_name.data,
+        RawMaterial.imported= form.imported.data 
+        RawMaterial.semi_finish= form.semi_finish.data
         # Add the new material to the database
         db.session.add(new_material)
         db.session.commit()
@@ -198,11 +202,11 @@ def edit_raw_material(material_id):
     material = RawMaterial.query.get_or_404(material_id)
     form = AddRawMaterialForm(obj=material)
     if form.validate_on_submit():
-        material.material_name=form.material_name.data,
-        material.supplier=form.supplier.data,
-        material.quantity_in_stock=form.quantity_in_stock.data,
-        material.import_date=form.import_date.data,
-        material.imported=form.imported.data,
+        material.material_name=form.material_name.data
+        material.supplier=form.supplier.data
+        material.quantity_in_stock=form.quantity_in_stock.data
+        material.import_date=form.import_date.data
+        material.imported=form.imported.data
         material.semi_finish=form.semi_finish.data
         db.session.commit()
         flash("Raw material updated successfully!", "success")

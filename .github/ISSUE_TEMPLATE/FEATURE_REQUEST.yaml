@@ -1,0 +1,57 @@
+```yaml
+name: Feature Request
+description: Suggest a new feature for the Factory Management System
+title: "[Feature] <Short description of the feature>"
+labels: ["enhancement"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature for the Factory Management System! Please provide details to help us understand your idea.
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Describe the feature and its purpose.
+      placeholder: e.g., Add a dashboard to visualize production metrics
+    validations:
+      required: true
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use Case
+      description: Who would benefit and how? Provide a specific scenario.
+      placeholder: e.g., Factory managers need to track real-time production output to optimize schedules
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed Solution
+      description: Suggest how this could be implemented (e.g., new Flask route, database table).
+      placeholder: e.g., Create /dashboard route with Chart.js integration
+    validations:
+      required: false
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of the system would this feature impact?
+      options:
+        - Frontend (HTML/CSS/JS)
+        - Backend (Flask)
+        - Database (MySQL)
+        - CI/CD or Deployment
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you’ve thought of?
+      placeholder: e.g., Using an external BI tool instead of a custom dashboard
+    validations:
+      required: false
+```

@@ -5,15 +5,16 @@ on:
   push:
     branches:          # ← direct commits
       - main
-      - dev            # ← add any extra branch you like
+      - dev2            # ← add any extra branch you like
   pull_request:        # ← PRs into these branches
     branches:
       - main
-      - dev
+      - dev2
 
 jobs:
   build-test-scan-publish:
     runs-on: ubuntu-latest
+    environment: DB_ENV   
 
     permissions:
       contents: read
@@ -77,7 +78,7 @@ jobs:
           docker push ${{ env.name }}:${{ github.sha }}
 
 
-          
+
       - name: Deploy via SSH to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -85,9 +86,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker rm -f db_project_container || true
-            docker pull ghcr.io/abdulahad1015/db_project:latest
-            docker run -d \
-              --name db_project_container \
-              -p 80:5000 \
-              ghcr.io/abdulahad1015/db_project:latest
+            cd hackops
+            docker compose down
+            docker compose up -d

@@ -171,7 +171,7 @@ def add_raw_material():
         new_material = RawMaterial(
             material_name=form.material_name.data,
             supplier=form.supplier.data,
-            # quantity_in_stock=form.quantity_in_stock.data,
+            quantity_in_stock=form.quantity_in_stock.data,
             import_date=form.import_date.data,
             imported=form.imported.data,
             semi_finish=form.semi_finish.data
@@ -210,14 +210,18 @@ def edit_raw_material(material_id):
 def delete_raw_material(material_id):
     material = RawMaterial.query.get_or_404(material_id)
     dependencies = ProductRawMaterial.query.filter_by(raw_material_id=material_id).all()
-    try:
-        db.session.delete(material)
-        db.session.commit()
-        flash("Raw material deleted successfully!", "success")
-    except IntegrityError as e:
-        db.session.rollback()
-        flash("Cannot delete raw material: This material is referenced in other records.", "danger")
-        app.logger.error(f"IntegrityError: {str(e)}")
+    if dependencies:
+        flash('Cannot delete raw material. It is currently linked to products.', 'warning')
+        return redirect(url_for('view_raw_material'))
+    else:
+        try:
+            db.session.delete(material)
+            db.session.commit()
+            flash("Raw material deleted successfully!", "success")
+        except IntegrityError as e:
+            db.session.rollback()
+            flash("Cannot delete raw material: This material is referenced in other records.", "danger")
+            app.logger.error(f"IntegrityError: {str(e)}")
     return redirect(url_for('view_raw_material'))
 
 

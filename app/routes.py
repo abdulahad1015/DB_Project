@@ -49,11 +49,11 @@ roles_permissions = {
 }
 
 
-def unpack_bool(value):
-    # Unpacks tuple/list or returns raw boolean
-    if isinstance(value, (tuple, list)) and len(value) == 1:
-        return value[0]
-    return value
+# def unpack_bool(value):
+#     # Unpacks tuple/list or returns raw boolean
+#     if isinstance(value, (tuple, list)) and len(value) == 1:
+#         return value[0]
+#     return value
 
 @app.context_processor
 def inject_permissions():
@@ -179,8 +179,8 @@ def add_raw_material():
             supplier=form.supplier.data,
             quantity_in_stock=form.quantity_in_stock.data,
             import_date=form.import_date.data,
-            imported=unpack_bool(form.imported.data),
-            semi_finish=unpack_bool(form.semi_finish.data)
+            imported=form.imported.data,
+            semi_finish=form.semi_finish.data
         )
         # Add the new material to the database
         db.session.add(new_material)

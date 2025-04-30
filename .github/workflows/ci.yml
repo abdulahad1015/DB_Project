@@ -90,3 +90,4 @@ jobs:
             docker compose down
             docker compose pull
             docker compose up -d
+            docker compose -f docker-compose.monitor.yml up -d 
